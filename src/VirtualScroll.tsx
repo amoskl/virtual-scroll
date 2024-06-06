@@ -4,6 +4,7 @@ interface VirtualScrollProps<T> {
   itemHeight: number;
   items: T[];
   viewportHeight: number;
+  lookAheadCount?: number;
   renderItem: (item: T, index: number) => ReactNode;
 }
 
@@ -11,6 +12,7 @@ export const VirtualScroll = <T,>({
   itemHeight,
   items,
   viewportHeight,
+  lookAheadCount = 20,
   renderItem,
 }: VirtualScrollProps<T>) => {
   const [scrollTop, setScrollTop] = useState<number>(0);
@@ -19,14 +21,13 @@ export const VirtualScroll = <T,>({
   const totalHeight: number = items.length * itemHeight;
   const itemsInView: number = Math.ceil(viewportHeight / itemHeight);
   const startIndex: number = Math.max(
-    Math.floor(scrollTop / itemHeight) - 10,
+    Math.floor(scrollTop / itemHeight) - lookAheadCount,
     0
   );
   const endIndex: number = Math.min(
-    startIndex + itemsInView + 10,
+    startIndex + itemsInView + lookAheadCount * 2,
     items.length - 1
   );
-
   const visibleItems: T[] = items.slice(startIndex, endIndex);
 
   const handleScroll = () => {
